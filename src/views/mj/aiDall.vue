@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref ,computed,watch} from 'vue';
-import {useMessage, NButton,NSelect,NInput, NImage} from 'naive-ui';
+import {useMessage, NButton,NSelect,NInput, NImage, c} from 'naive-ui';
 import {gptFetch, mlog, upImg} from '@/api'
 import { homeStore } from '@/store';
 import { SvgIcon } from '@/components/common';
@@ -11,11 +11,14 @@ const config = ref( {
 model:[
 {  "label": "DALL·E 3", "value": "dall-e-3" }
  ,{  "label": "GPT-Image-1", "value": "gpt-image-1" }
+ ,{  "label": "flux-kontext-pro", "value": "flux-kontext-pro" }
+ ,{  "label": "flux-kontext-max", "value": "flux-kontext-max" }
  ,{  "label": "DALL·E 2", "value": "dall-e-2" }
  ,{  "label": "Flux", "value": "flux" }
  ,{  "label": "Flux-Dev", "value": "flux-dev" }
  ,{  "label": "Flux-Pro", "value": "flux-pro" }
- ,{  "label": "Flux.1.1-Pro", "value": "flux.1.1-pro" }
+ ,{  "label": "Flux-Pro-1.1", "value": "flux-pro-1.1" }
+ ,{  "label": "Flux-Pro-1.1-Ultra", "value": "flux-pro-1.1-ultra" }
 ]
 });
 interface myFile{
@@ -27,8 +30,14 @@ const fsRef= ref() ;
 const base64Array= ref<myFile[]>([]);    
 const f = ref({size:'1024x1024', prompt:'',"model": "dall-e-3","n": 1});
 const isDisabled= computed(()=>{
-    if(st.value.isGo) return true;
-    if(f.value.prompt.trim()=='') return true;
+    if(st.value.isGo) {
+        //console.log('st.value.isGo',st.value.isGo);
+        return true;
+    }
+    if(f.value.prompt.trim()=='') {
+        //console.log('prompt',"空");
+        return true;
+    }
     return false;
 });
 const create= async ()=>{
@@ -117,6 +126,7 @@ watch(()=>f.value.model,(n)=>{
 const isCanImageEdit= computed(()=>{
     if(f.value.model=='dall-e-2') return true;
     if(f.value.model=='gpt-image-1') return true;
+    if(f.value.model.indexOf('kontext')>-1) return true;
     return false;
 })
 
@@ -130,7 +140,7 @@ const selectFile=(input:any)=>{
             return ;
         }
         base64Array.value.push({file: ff ,base64:d});
-        if(base64Array.value.length>1) st.value.isGo=true;
+        //if(base64Array.value.length>1) st.value.isGo=true;
         //if(st)
     }).catch(e=>ms.error(e));
 }
